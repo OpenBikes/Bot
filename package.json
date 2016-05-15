@@ -24,6 +24,8 @@
   "homepage": "https://github.com/OpenBikes/Bot#readme",
   "dependencies": {
     "body-parser": "^1.15.1",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "request": "^2.72.0",
+    "requests": "^0.1.7"
   }
 }
