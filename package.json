@@ -1,0 +1,29 @@
+{
+  "name": "openbikes-bot",
+  "version": "1.0.0",
+  "description": "A Messenger Bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenBikes/Bot.git"
+  },
+  "keywords": [
+    "openbikes",
+    "bot",
+    "messenger"
+  ],
+  "author": "openbikes.co",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OpenBikes/Bot/issues"
+  },
+  "homepage": "https://github.com/OpenBikes/Bot#readme",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4"
+  }
+}
