@@ -33,6 +33,20 @@ app.post('/webhook/', function (req, res) {
     if (event.message && event.message.text) {
       text = event.message.text;
       console.log(text);
+
+      if (text == 'Choose') {
+          sendPickACityMessage(sender);
+          continue;
+      }
+
+      console.log(req.body.entry[0].messaging)
+      if (event.postback) {
+          text = event.postback;
+          console.log(text);
+          sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
+          continue;
+      }
+
       if (text === 'Toulouse') {
           getCityLastGeoJSON(text);
           continue;
@@ -107,7 +121,7 @@ function sendGenericMessage(sender) {
   });
 }
 
-// Make a call to OpenBikes api
+// Make a call to OpenBikes API
 function getCityLastGeoJSON(city) {
     var url = "http://openbikes.co/api/geojson/" + city
 
@@ -116,9 +130,49 @@ function getCityLastGeoJSON(city) {
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
-            console.log(body)
+            stations = body.features;
+            for (i = 0; i < stations.length; i++) {
+              station_name = stations[i].properties.name;
+              console.log(station_name)
+            }
         }
     })
 }
+
+function sendPickACityMessage(sender) {
+  messageData = {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements": [{
+          "title": "OpenBikes",
+          "subtitle": "Choose a city",
+          "buttons": [{
+            "type": "postback",
+            "title": "Toulouse",
+            "payload": "Payload for first element in a generic bubble",
+          }],
+        }]
+      }
+    }
+  };
+  request({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: {access_token:access_token},
+    method: 'POST',
+    json: {
+      recipient: {id:sender},
+      message: messageData,
+    }
+  }, function(error, response, body) {
+    if (error) {
+      console.log('Error sending message: ', error);
+    } else if (response.body.error) {
+      console.log('Error: ', response.body.error);
+    }
+  });
+}
+
 
 app.listen(process.env.PORT || 3000)
