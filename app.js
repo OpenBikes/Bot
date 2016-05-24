@@ -11,8 +11,9 @@ var app = express();
 // Parse all json contents
 app.use(bodyParser.json())
 
-// Listen to config port or to localhost:3000
-app.listen(process.env.PORT || 3000)
+// Listen to config port (localhost:8080) or to localhost:3000
+// app.listen(process.env.PORT);
+app.listen(3000);
 
 // Send message
 function sendTextMessage(sender, text) {
@@ -73,43 +74,21 @@ function sendGenericMessage(sender) {
   });
 }
 
-// Make a call to OpenBikes API to get countries
-function getCountries() {
-  var url = "http://openbikes.co/api/countries"
-
-  request({
-	  url: url,
-	  json: true
-  }, function(error, response, body) {
-	  if (!error && response.statusCode === 200) {
-		  countries = body.data;
-		  for (i = 0; i < countries.length; i++) {
-			  country_name = countries[i].country;
-			  console.log(country_name)
-		  }
-	  }
-  })
+function welcome_step_1(sender) {
+    sendTextMessage(sender, "We need to ask your current position in order to predict bikes or stands.");
+    console.log("We need to ask your current position in order to predict bikes or stands.");
 }
-
-// Make a call to OpenBikes API to get all cities
-function getCities() {
-  var url = "http://openbikes.co/api/countries"
-  var cities = [];
-  request({
-	  url: url,
-	  json: true
-  }, function(error, response, body) {
-	  if (!error && response.statusCode === 200) {
-		  data = body.data;
-		  for (i = 0; i < data.length; i++) {
-			  data_cities = data[i].cities;
-			  for (j = 0; j < data_cities.length; j++) {
-				cities.push(data_cities[j])
-			  }   
-		  }
-		  return cities
-	  }
-  })
+function welcome_step_2(sender) {
+    sendTextMessage(sender, "But.. how to share my current position ? It's very simple.");
+    console.log("But.. how to share my current position ? It's very simple.");
+}
+function welcome_step_3(sender) {
+    sendTextMessage(sender, "Tap Location logo. You'll see a blue circle at your current location.");
+    console.log("Tap Location logo. You'll see a blue circle at your current location.");
+}
+function welcome_step_4(sender) {
+    sendTextMessage(sender, "Finally, tap send.");
+    console.log("Finally, tap send.");
 }
 
 
@@ -178,7 +157,7 @@ function sendMakeChoiceMessage(sender) {
 // Pick a bike
 function pickbike(sender, text) {
   sendTextMessage(sender, text);
-  getCities();
+  // getCities();
 }
 
 // Drop a bike off
@@ -192,14 +171,11 @@ function fulltrip(sender, text) {
 }
 
 function askCity(sender) {
-  response = 'Can you tell me in what city you are ?'
+  response = 'Can you tell me in what city you are ?';
   sendTextMessage(sender, response);
 }
 
 // ROUTING
-
-// Global variables
-var cities = getCities();
 
 // Test connection over modulus
 app.get('/ping', function(req, res) {
@@ -208,7 +184,7 @@ app.get('/ping', function(req, res) {
 
 // Verify crendentials
 app.get('/webhook', function(req, res) {
-  if (req.query['hub.verify_token'] === 'Wyv6tMhBrGZfQ9Ut') {
+  if (req.query['hub.verify_token'] === verify_token) {
 	  res.send(req.query['hub.challenge']);
   }
   res.send('Error, wrong validation token');
@@ -219,29 +195,42 @@ app.post('/webhook/', function(req, res) {
   messaging_events = req.body.entry[0].messaging;
   for (i = 0; i < messaging_events.length; i++) {
 	  event = req.body.entry[0].messaging[i];
-	  sender = event.sender.id;
+
+      sender = event.sender.id;
+      console.log(event.message)
+
 	  if (event.message && event.message.text) {
 		  text = event.message.text;
 		  console.log(text);
 
-		  console.log(cities);
+          setTimeout(function() {
+              welcome_step_1(sender);
+          }, 1000)
+          setTimeout(function() {
+              welcome_step_2(sender);
+          }, 2000)
+          setTimeout(function() {
+              welcome_step_3(sender);
+          }, 3000)
+          setTimeout(function() {
+              welcome_step_4(sender);
+          }, 4000)
 
-		  sendTextMessage(sender, test);
-
-		  if (text == 'Choose') {
-			  sendMakeChoiceMessage(sender);
-			  continue;
-		  } 
-		  else if (text === 'Countries') {
-			  getCountries();
-			  continue;
-		  } 
-		  else if (text === 'Website') {
-			  sendGenericMessage(sender);
-			  continue;
-		  }
-		  sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200));
-	  } else if (event.postback) {
+		//   if (text == 'Choose') {
+		// 	  sendMakeChoiceMessage(sender);
+		// 	  continue;
+		//   }
+		//   else if (text === 'Countries') {
+		// 	//   getCountries();
+		// 	  continue;
+		//   }
+		//   else if (text === 'Website') {
+		// 	  sendGenericMessage(sender);
+		// 	  continue;
+		//   }
+		//   sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200));
+	  }
+      else if (event.postback) {
 		  text = event.postback.payload;
 		  console.log(text);
 		  if (text === 'pickbike') {
@@ -258,6 +247,14 @@ app.post('/webhook/', function(req, res) {
 			  continue;
 		  }
 	  }
+      else if (event.message.hasOwnProperty('attachments')) {
+          console.log(event.message.attachments);
+          attachments = event.message.attachments[0];
+          coordinates = attachments.payload.coordinates;
+          console.log(coordinates);
+          console.log(coordinates.lat);
+          console.log(coordinates.long);
+      }
   }
   res.sendStatus(200);
 });

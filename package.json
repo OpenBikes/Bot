@@ -28,7 +28,6 @@
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "node-env-file": "^0.1.8",
-    "request": "^2.72.0",
-    "requests": "^0.1.7"
+    "request": "^2.72.0"
   }
 }
