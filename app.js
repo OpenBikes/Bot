@@ -6,15 +6,18 @@ const _ = require('lodash');
 const moment = require('moment');
 const clc = require('cli-color');
 
-const access_token = process.env.FB_ACCESS_TOKEN;
-const verify_token = process.env.FB_VERIFY_TOKEN;
-
 // Predefine needed stylings
 const error = clc.red.bold;
 const warn = clc.yellow;
-const info = clc.cyan;
+const info = clc.cyan.bold;
 const debug = clc.magenta.italic;
 const user = clc.green;
+const server = clc.yellow;
+
+// Global variables
+const access_token = process.env.FB_ACCESS_TOKEN;
+const verify_token = process.env.FB_VERIFY_TOKEN;
+var dateFormat = 'h:mm';
 
 // Launch App
 var app = express();
@@ -24,7 +27,7 @@ app.use(bodyParser.json())
 
 // Listen to config port (localhost:8080) or to localhost:3000
 app.listen(process.env.PORT || 3000);
-console.log(info('Server is running.'));
+console.log(server('Server is running.'));
 
 // Send message
 function sendTextMessage(sender, text) {
@@ -92,6 +95,13 @@ function sendGenericMessage(sender) {
 		}
 	});
 }
+
+// Debug the user response
+function userResponse(sender, text) {
+	console.log(user(sender + ' respond : '));
+	console.log(text);
+}
+
 
 function welcome_step_1(sender) {
 	sendTextMessage(sender, "We need to ask your current position in order to predict bikes or stands.");
@@ -196,9 +206,9 @@ function fulltrip(sender, text) {
 	sendTextMessage(sender, text);
 }
 
-function askCity(sender) {
-	response = 'Can you tell me in what city you are ?';
-	sendTextMessage(sender, response);
+// Check if a date is valid
+function isValidDate(dateStr) {
+	return moment(dateStr, dateFormat).isValid()
 }
 
 // ROUTING
@@ -226,7 +236,7 @@ app.post('/webhook/', function(req, res) {
 
 		if (event.message && event.message.text) {
 			text = event.message.text;
-			console.log(user(text));
+			userResponse(sender, text);
 
 			welcome_step_1(sender);
 			welcome_step_2(sender);
@@ -234,9 +244,14 @@ app.post('/webhook/', function(req, res) {
 			welcome_step_4(sender);
 
 			if (text == 'Now') {
-				console.log('Now');
-				now = moment().format();
-				console.log(now);
+				userResponse(sender, text);
+				now = moment().unix();
+				console.log(user(now));
+			} else if (isValidDate(text)) {
+				userResponse(sender, text);
+				date = moment(text, dateFormat);
+				console.log('Date is valid');
+				console.log(user(date.unix()));
 			}
 
 			//   if (text == 'Choose') {
@@ -254,7 +269,7 @@ app.post('/webhook/', function(req, res) {
 			//   sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200));
 		} else if (event.postback) {
 			text = event.postback.payload;
-			console.log(text);
+			userResponse(sender, text);
 			if (text === 'pickbike') {
 				response = 'I notice you want to pick a bike'
 				pickbike(sender, response);
@@ -271,7 +286,7 @@ app.post('/webhook/', function(req, res) {
 		} else if (_.has(event.message, 'attachments')) {
 			attachments = event.message.attachments[0];
 			coordinates = attachments.payload.coordinates;
-			console.log(coordinates);
+			userResponse(sender, coordinates);
 			sendTextMessage(sender, "When do you want to go ?");
 			sendTextMessage(sender, "Respond choices : now / at HH:MM");
 		}
