@@ -5,6 +5,7 @@ const dotenv = require('dotenv').config();
 const _ = require('lodash');
 const moment = require('moment');
 const clc = require('cli-color');
+const redis = require('redis');
 
 // Predefine needed stylings
 const error = clc.red.bold;
@@ -12,12 +13,16 @@ const warn = clc.yellow;
 const info = clc.cyan.bold;
 const debug = clc.magenta.italic;
 const user = clc.green;
-const server = clc.yellow;
+const server = clc.yellow.bold;
 
 // Global variables
 const access_token = process.env.FB_ACCESS_TOKEN;
 const verify_token = process.env.FB_VERIFY_TOKEN;
+
 var dateFormat = 'h:mm';
+
+// Launch Redis client
+var client = redis.createClient();
 
 // Launch App
 var app = express();
@@ -28,6 +33,15 @@ app.use(bodyParser.json())
 // Listen to config port (localhost:8080) or to localhost:3000
 app.listen(process.env.PORT || 3000);
 console.log(server('Server is running.'));
+
+// Connect to Redis database
+client.on('connect', function() {
+	console.log(info('Connected to Redis'));
+});
+// Handle Redis errors
+client.on("error", function(err) {
+	console.log("Error " + err);
+});
 
 // Send message
 function sendTextMessage(sender, text) {
@@ -249,9 +263,17 @@ app.post('/webhook/', function(req, res) {
 				console.log(user(now));
 			} else if (isValidDate(text)) {
 				userResponse(sender, text);
-				date = moment(text, dateFormat);
+				date = moment(text, dateFormat).unix();
 				console.log('Date is valid');
-				console.log(user(date.unix()));
+				console.log(user(date));
+				sendMakeChoiceMessage(sender);
+				client.hmset(sender, {
+					"date": date,
+					"text": text
+				});
+				client.hgetall(sender, function(err, obj) {
+					console.log(obj);
+				});
 			}
 
 			//   if (text == 'Choose') {
