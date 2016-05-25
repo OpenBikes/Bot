@@ -3,3 +3,5 @@ DEPLOYMENT.md
 SECRET.md
 ngrok
 node_modules
+.html
+*.log
