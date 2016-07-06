@@ -1,0 +1,14 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "rules": {
+    "semi": [2, "never"],
+    "key-spacing": 0,
+    "space-infix-ops": 0,
+    "no-multi-spaces": 0,
+    "no-useless-escape": 0
+  }
+}
