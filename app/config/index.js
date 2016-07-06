@@ -9,22 +9,13 @@ export default {
 		host: process.env.__BROKER_HOST__ || 'redis',
 		port: process.env.__BROKER_PORT__ || 6379,
 		pass: process.env.__BROKER_PASS__ || false,
-	}
+	},
 
-	requestFbMessenger: {
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {
-			access_token: process.env.FB_ACCESS_TOKEN
-		},
-		method: 'POST',
-		json: {
-			recipient: {
-				id: sender
-			},
-			message: messageData,
-		}
-	}
+	log: {
+    	level: process.env.LOG_LEVEL || 'debug',
+    	namespace: process.env.LOG_NAMESPACE || 'obot',
+  	},
 
-	dateFormat: 'h:mm'
+	dateFormat: 'h:mm',
 
 }

@@ -1,5 +1,25 @@
 import config from '../config'
 import { msgErrorHandler } from './util'
+import logger from './logger'
+
+const log = logger('obot.lib.messenger')
+
+
+export function requestFbMessenger(sender, messageData) {
+	return {
+		url: 'https://graph.facebook.com/v2.6/me/messages',
+		qs: {
+			access_token: config.accessToken
+		},
+		method: 'POST',
+		json: {
+			recipient: {
+				id: sender,
+			},
+			message: messageData,
+		}
+	}
+}
 
 // Send message
 export function sendTextMessage(sender, text) {
@@ -33,9 +53,7 @@ export function sendGenericMessage(sender) {
 }
 
 // Debug the user response
-export function userResponse(sender, text) {
-	console.log('%s response : %s', sender, text)
-}
+export const userResponse = (sender, text) => log.info({ sender, text }, 'user answered')
 
 export function sendMakeChoiceMessage(sender) {
 	messageData = {

@@ -50,6 +50,7 @@
     "express": "^4.13.4",
     "jscs": "^3.0.6",
     "lodash": "^4.13.1",
+    "method-override": "^2.3.6",
     "moment": "^2.13.0",
     "node-env-file": "^0.1.8",
     "npm-check": "^5.2.2",

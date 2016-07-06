@@ -4,6 +4,8 @@ services:
 
   redis:
     image: redis:3.0.3
+    environment:
+      - __BROKER_HOST__=redis
     ports:
       - 6379:6379
 

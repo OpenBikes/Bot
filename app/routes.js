@@ -1,11 +1,12 @@
 import config from './config'
 import { userResponse } from './lib/messenger'
+import { updateState } from './lib/state'
 
-export default function (app) {
+export default function (app, redis) {
 
 	// Test connection over modulus
 	app.get('/ping', function(req, res) {
-		res.send('pong')
+		res.status(200).json({ ping: 'pong' })
 	})
 
 	// Verify crendentials
@@ -18,16 +19,19 @@ export default function (app) {
 
 	// Receive messaging events
 	app.post('/webhook/', function(req, res) {
-		messaging_events = req.body.entry[0].messaging
-		for (i = 0 i < messaging_events.length i++) {
-			event = req.body.entry[0].messaging[i]
-
-			sender = event.sender.id
+		const messaging_events = req.body.entry[0].messaging
+		let i
+		for (i = 0; i < messaging_events.length; i++) {
+			let event = req.body.entry[0].messaging[i]
+			let sender = event.sender.id
 
 			if (event.message && event.message.text) {
-				text = event.message.text
+				let text = event.message.text
 				userResponse(sender, text)
+				// Update user state for smart interactions
+				updateState(redis, sender)
 			}
-	}
+		}
 	res.sendStatus(200)
-})
+	})
+}
