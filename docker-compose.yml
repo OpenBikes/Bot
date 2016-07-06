@@ -4,15 +4,14 @@ services:
 
   redis:
     image: redis:3.0.3
-    environment:
-      - __BROKER_HOST__=redis
     ports:
       - 6379:6379
 
-  lab:
+  server:
     build: .
     stdin_open: true
     tty: true
+    env_file: .env
     working_dir: /app
     volumes:
       - .:/app

@@ -6,3 +6,15 @@ OBot's work is to help users to make a trip with sharing bikes. He can advise us
 
 ![obot](obot.png)
 
+
+## Docker
+
+Build container :
+```sh
+docker build --rm -t obot/dev -f Dockerfile .
+```
+
+Run container :
+```sh
+docker run -i -t obot/dev
+```
