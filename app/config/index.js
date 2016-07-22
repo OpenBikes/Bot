@@ -1,5 +1,6 @@
 export default {
 
+	OK: 200,
 	port: process.env.PORT || 3000,
 
 	accessToken: process.env.FB_ACCESS_TOKEN,
