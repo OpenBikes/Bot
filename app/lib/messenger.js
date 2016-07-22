@@ -53,7 +53,7 @@ export function sendGenericMessage(sender) {
 }
 
 // Debug the user response
-export const userResponse = (sender, text) => log.info({ sender, text }, 'user answered')
+export const userResponse = (sender, text) => log.info({ sender, text }, 'new message received')
 
 export function sendMakeChoiceMessage(sender) {
 	messageData = {

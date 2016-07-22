@@ -1,4 +1,9 @@
 import config from '../config'
+import logger from './logger'
+import { userResponse } from './messenger'
+import { updateState } from './state'
+
+const log = logger('obot.middleware')
 
 export function getPing(req, res) {
   res.status(config.OK).json({ ping: 'pong' })
@@ -24,6 +29,11 @@ export function handleMsgEvents(req, res) {
 			// Update user state for smart interactions
 			updateState(redis, sender)
 		}
+		if (event.postback) {
+        	let text = event.postback
+        	sendTextMessage(sender, "Postback received: " + text)
+        	continue
+      	}
 	}
 	res.sendStatus(200)
 }

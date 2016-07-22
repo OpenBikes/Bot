@@ -1,5 +1,3 @@
-import { userResponse } from './lib/messenger'
-import { updateState } from './lib/state'
 import { 
 	getPing, 
 	verifyCredentials, 
