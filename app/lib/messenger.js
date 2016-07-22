@@ -1,6 +1,7 @@
 import config from '../config'
 import { msgErrorHandler } from './util'
 import logger from './logger'
+import request from 'request'
 
 const log = logger('obot.lib.messenger')
 
@@ -23,13 +24,13 @@ export function requestFbMessenger(sender, messageData) {
 
 // Send message
 export function sendTextMessage(sender, text) {
-	messageData = { text }
-	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
+	let messageData = { text }
+	request(requestFbMessenger(sender, messageData), msgErrorHandler)
 }
 
 // Send a message with a Template
 export function sendGenericMessage(sender) {
-	messageData = {
+	let messageData = {
 		"attachment": {
 			"type": "template",
 			"payload": {
@@ -47,14 +48,14 @@ export function sendGenericMessage(sender) {
 			}
 		}
 	}
-	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
+	request(requestFbMessenger(sender, messageData), msgErrorHandler)
 }
 
 // Debug the user response
 export const userResponse = (sender, text) => log.info({ sender, text }, 'new message received')
 
 export function sendMakeChoiceMessage(sender) {
-	messageData = {
+	let messageData = {
 		"attachment": {
 			"type": "template",
 			"payload": {
@@ -79,5 +80,5 @@ export function sendMakeChoiceMessage(sender) {
 			}
 		}
 	};
-	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
+	request(requestFbMessenger(sender, messageData), msgErrorHandler)
 }

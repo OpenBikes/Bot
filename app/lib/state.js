@@ -7,28 +7,31 @@ const log = logger('obot.lib.state')
 // Launch Redis client
 const redis = redisConn(config.broker.host, config.broker.port, config.broker.pass)
 
-export function updateState(sender) {	
+export function updateState(sender, stateToUpdate) {	
 	// Verify state
-	redis.get(sender, function (err, reply) {
-		log.info({ state: reply.toString(), sender: sender }, 'actual state')
-	    // Store senderId and initial state in Redis
-		if (reply === 'NaN') {
-			log.info({ state: 1, sender: sender }, 'init state')
-			redis.set(sender, 1)
+	redis.exists(sender, function(err, reply) {
+		log.info({ state: reply.toString(), sender }, 'actual state')
+	    // Key exists so update sender state 
+		if (reply === 1) {
+			redis.get(sender, function(err, reply) {
+				log.info({ state: stateToUpdate, sender }, 'update state')
+				redis.set(sender, stateToUpdate)	
+			})
 		}
-		// Update state 
+		// Key doesn't exists so set initial state
 		else {
-			log.info({ state: reply.toString(), sender: sender }, 'update state')
-			redis.set(sender, parseInt(reply)+1)	
+			log.info({ state: 'welcome', sender }, 'init state')
+			redis.set(sender, 'welcome')
 		}
 	})	
-	
-	// This will return a JavaScript String
-	redis.get(sender, function (err, reply) {
-		log.info({ state: reply.toString(), sender: sender }, 'new state')
-	})
 }
 
 export function getState(sender) {
-	return eval(redis.get(sender))
+	return redis.get(sender, function (err, reply) {
+		if (reply) {
+			console.log('reply', reply)
+		} else {
+			log.error({ err }, 'error getting key')
+		}
+	})
 }
