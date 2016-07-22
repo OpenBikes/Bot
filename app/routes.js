@@ -4,7 +4,7 @@ import {
 	handleMsgEvents 
 } from './lib/middleware'
 
-export default function (app, redis) {
+export default function (app, client) {
 
 	// Test connection over modulus
 	app.get('/ping', getPing)

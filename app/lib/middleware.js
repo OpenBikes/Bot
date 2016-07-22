@@ -1,7 +1,7 @@
 import config from '../config'
 import logger from './logger'
 import { userResponse } from './messenger'
-import { updateState } from './state'
+import { updateState, getState } from './state'
 
 const log = logger('obot.middleware')
 
@@ -26,8 +26,13 @@ export function handleMsgEvents(req, res) {
 		if (event.message && event.message.text) {
 			let text = event.message.text
 			userResponse(sender, text)
-			// Update user state for smart interactions
-			updateState(redis, sender)
+			let state = getState(sender)
+			console.log(state)
+			// if (state === '1') {
+				
+			// }
+			// // Update user state for smart interactions
+			// updateState(sender)
 		}
 		if (event.postback) {
         	let text = event.postback

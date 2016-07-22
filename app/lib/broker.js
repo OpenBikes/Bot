@@ -13,22 +13,24 @@ function onAuth(err, res) {
 }
 
 export function redisConn(host, port, pass) {
+  if (client) return client
+
   const client = redis.createClient(port, host)
 
+  log.info({ host, port }, 'redis client parameters')
   if (pass) {
     log.info('trying to authenticate to redis server')
     client.auth(pass, onAuth)
   }
 
-  client.on('connect', () => console.log({ host, port }, 'successfully connected to redis'))
+  client.on('connect', () => log.info({ host, port }, 'successfully connected to redis'))
 
   client.on('error', (err) => {
     log.error({ err }, 'error connecting to redis')
 
-    // abort if Redis isn't available
+    // abort if we do not have an healthy broker available
     process.exit(1)
   })
 
   return client
 }
-

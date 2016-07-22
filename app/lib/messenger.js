@@ -23,10 +23,8 @@ export function requestFbMessenger(sender, messageData) {
 
 // Send message
 export function sendTextMessage(sender, text) {
-	messageData = {
-		text: text
-	}
-	request(config.requestFbMessenger, msgErrorHandler(err, res, body))
+	messageData = { text }
+	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
 }
 
 // Send a message with a Template
@@ -49,7 +47,7 @@ export function sendGenericMessage(sender) {
 			}
 		}
 	}
-	request(config.requestFbMessenger, msgErrorHandler(err, res, body))
+	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
 }
 
 // Debug the user response
@@ -81,5 +79,5 @@ export function sendMakeChoiceMessage(sender) {
 			}
 		}
 	};
-	request(config.requestFbMessenger, msgErrorHandler(err, res, body))
+	request(requestFbMessenger(sender, messageData), msgErrorHandler(err, res, body))
 }
