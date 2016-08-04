@@ -1,10 +1,14 @@
 import config from '../config'
 import logger from './logger'
+import { redisConn } from './broker'
 import { userResponse, sendTextMessage } from './messenger'
 import { updateState, getState } from './state'
 import _ from 'lodash'
 
 const log = logger('obot.middleware')
+
+// Launch Redis client
+const redis = redisConn(config.broker.host, config.broker.port, config.broker.pass)
 
 export function getPing(req, res) {
   res.status(config.OK).json({ ping: 'pong' })
@@ -17,6 +21,8 @@ export function verifyCredentials(req, res) {
 	res.send('Error, wrong validation token')
 }
 
+const hasMessage = (event) => event.message && event.message.text 
+
 export function handleMsgEvents(req, res) {
 	const messaging_events = req.body.entry[0].messaging
 
@@ -25,21 +31,26 @@ export function handleMsgEvents(req, res) {
 		let sender = event.sender.id
 
 		console.log(event.message)
-		if (event.message && event.message.text) {
+		if (hasMessage(event)) {
 			let text = event.message.text
 			userResponse(sender, text)
 			sendTextMessage(sender, text)
-			
-			// Update user state for smart interactions
-			updateState(sender, 'location')
 
-			let state = getState(sender)
-			console.log(state)
-			if (state === 'welcome') {
-				_.forEach(config.message_step_1, function(msg) {
-					sendTextMessage(sender, msg)
-				})
-			}
+			getState(sender)
+				.then(x => console.log({state: x}, 'get state'))
+				.then(updateState(sender))
+				.then(x => console.log({state: x}, 'update state'))
+				.catch(onError(sender))
+
+			// log.info({ state, sender }, 'get state value')
+			
+			// // let state = 'welcome'
+			// console.log(state)
+			// if (state === 'welcome') {
+			// 	_.forEach(config.message_step_1, function(msg) {
+			// 		sendTextMessage(sender, msg)
+			// 	})
+			// }
 		} else if (event.postback) {
         	let text = event.postback
         	sendTextMessage(sender, "Postback received: " + text)
@@ -53,4 +64,8 @@ export function handleMsgEvents(req, res) {
 		}
 	}
 	res.sendStatus(200)
+}
+
+function onError(sender) {
+  return (err) => log.error({ err, sender }, 'caught error')
 }

@@ -12,7 +12,11 @@ OBot's work is to help users to make a trip with sharing bikes. He can advise us
 
 ```sh
 docker-compose up -d
-docker exec -it obot_server_1 node app/index.js
+docker exec -it obot_server_1 bash
+```
+and then :
+```sh
+DEBUG='obot.*' node app/index.js | ./node_modules/.bin/bunyan
 ```
 
 ### `ngrok`
