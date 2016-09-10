@@ -33,7 +33,7 @@ _*
 
 # private stuff
 .env
-.unenv
+.env_docker
 SECRET.md
 
 coverage/

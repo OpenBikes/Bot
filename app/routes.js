@@ -6,7 +6,7 @@ import {
 
 export default function (app, client) {
 
-	// Test connection over modulus
+	// Test connection 
 	app.get('/ping', getPing)
 
 	// Verify crendentials

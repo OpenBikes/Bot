@@ -26,20 +26,18 @@ const hasMessage = (event) => event.message && event.message.text
 export function handleMsgEvents(req, res) {
 	const messaging_events = req.body.entry[0].messaging
 
-	for (var i = 0; i < messaging_events.length; i++) {
-		let event = req.body.entry[0].messaging[i];
+	_.forEach(messaging_events, function(event) {
 		let sender = event.sender.id
 
-		console.log(event.message)
 		if (hasMessage(event)) {
 			let text = event.message.text
 			userResponse(sender, text)
 			sendTextMessage(sender, text)
 
 			getState(sender)
-				.then(x => console.log({state: x}, 'get state'))
+				.then(x => console.log({ state: x }, 'get state'))
 				.then(updateState(sender))
-				.then(x => console.log({state: x}, 'update state'))
+				.then(x => console.log({ state: x }, 'update state'))
 				.catch(onError(sender))
 
 			// log.info({ state, sender }, 'get state value')
@@ -62,7 +60,7 @@ export function handleMsgEvents(req, res) {
 			sendTextMessage(sender, "When do you want to go ?");
 			sendTextMessage(sender, "Respond choices : now / at HH:MM");
 		}
-	}
+	}) 
 	res.sendStatus(200)
 }
 

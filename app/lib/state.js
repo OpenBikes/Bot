@@ -12,7 +12,7 @@ const convertReply = reply => parseInt(reply) || 0
 export function getState(sender) {
   return new Promise((resolve, reject) => {
     redis.get(sender, (err, reply) => {
-    	err ? reject(err): resolve(reply)
+    	return err ? reject(err): resolve(convertReply(reply))
     })
   })
 }
@@ -20,8 +20,23 @@ export function getState(sender) {
 export function updateState(sender) {
   return new Promise((resolve, reject) => {
     redis.exists(sender, (err, reply) => {
-		redis.set(sender, convertReply(reply)+1)
-	    return err ? reject(err): resolve(reply)
+      if (reply === "1" || reply === 1) {
+        console.log('Key exists')
+        redis.get(sender, (err, reply) => {
+          console.log(reply)
+          let state = convertReply(reply) + 1
+          redis.set(sender, state, (err, reply) => {
+            return err ? reject(err): resolve(state)
+          })
+        })
+      } else {
+        console.log('Key does not exist')
+        let state = 0
+        redis.set(sender, state, (err, reply) => {
+          return err ? reject(err): resolve(state)
+        })
+      }
+	    return err ? reject(err) : null
     })
   })
 }
