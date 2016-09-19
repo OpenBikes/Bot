@@ -39,10 +39,7 @@ export function handleMsgEvents(req, res) {
 				.then(updateState(sender))
 				.then(x => console.log({ state: x }, 'update state'))
 				.catch(onError(sender))
-
-			// log.info({ state, sender }, 'get state value')
 			
-			// // let state = 'welcome'
 			// console.log(state)
 			// if (state === 'welcome') {
 			// 	_.forEach(config.message_step_1, function(msg) {
