@@ -20,10 +20,10 @@ app.use(bodyParser.json())
 // Setup routes
 configureRoutes(app)
 
-// Override HTTP native methode
+// Override HTTP native method
 app.use(methodOverride())
 
-// Start Express server.
+// Start Express server
 app.listen(app.get('port'), () => {
 	log.info({ port: app.get('port'), env: app.get('env') }, 'express server listening')
 })

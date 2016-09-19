@@ -31,18 +31,18 @@ export function sendTextMessage(sender, text) {
 // Send a message with a Template
 export function sendGenericMessage(sender) {
 	let messageData = {
-		"attachment": {
-			"type": "template",
-			"payload": {
-				"template_type": "generic",
-				"elements": [{
-					"title": "OpenBikes website",
-					"subtitle": "Not Just Biking",
-					"image_url": "http://openbikes.co/static/img/OpenBikes.png",
-					"buttons": [{
-						"type": "web_url",
-						"url": "http://openbikes.co",
-						"title": "Web url"
+		attachment: {
+			type: "template",
+			payload: {
+				template_type: "generic",
+				elements: [{
+					title: "OpenBikes website",
+					subtitle: "Not Just Biking",
+					image_url: "http://openbikes.co/static/img/OpenBikes.png",
+					buttons: [{
+						type: "web_url",
+						url: "http://openbikes.co",
+						title: "Web url"
 					}],
 				}]
 			}
@@ -56,25 +56,25 @@ export const userResponse = (sender, text) => log.info({ sender, text }, 'new me
 
 export function sendMakeChoiceMessage(sender) {
 	let messageData = {
-		"attachment": {
-			"type": "template",
-			"payload": {
-				"template_type": "generic",
-				"elements": [{
-					"title": "OpenBikes",
-					"subtitle": "Let me help you.",
-					"buttons": [{
-						"type": "postback",
-						"title": "Pick up a bike",
-						"payload": "pickbike",
+		attachment: {
+			type: "template",
+			payload: {
+				template_type: "generic",
+				elements: [{
+					title: "OpenBikes",
+					subtitle: "Let me help you.",
+					buttons: [{
+						type: "postback",
+						title: "Pick up a bike",
+						payload: "pickbike",
 					}, {
-						"type": "postback",
-						"title": "Drop a bike off",
-						"payload": "dropbike",
+						type: "postback",
+						title: "Drop a bike off",
+						payload: "dropbike",
 					}, {
-						"type": "postback",
-						"title": "Make a trip",
-						"payload": "fulltrip",
+						type: "postback",
+						title: "Make a trip",
+						payload: "fulltrip",
 					}],
 				}]
 			}

@@ -1,8 +1,9 @@
 import config from '../config'
 import logger from './logger'
 import { redisConn } from './broker'
-import { userResponse, sendTextMessage } from './messenger'
+import { userResponse, sendTextMessage, sendMakeChoiceMessage } from './messenger'
 import { updateState, getState } from './state'
+import { getClosestCity } from './obapi'
 import _ from 'lodash'
 
 const log = logger('obot.middleware')
@@ -40,6 +41,8 @@ export function handleMsgEvents(req, res) {
 				.then(x => console.log({ state: x }, 'update state'))
 				.catch(onError(sender))
 			
+			sendMakeChoiceMessage(sender, text)
+
 			// console.log(state)
 			// if (state === 'welcome') {
 			// 	_.forEach(config.message_step_1, function(msg) {
@@ -47,15 +50,20 @@ export function handleMsgEvents(req, res) {
 			// 	})
 			// }
 		} else if (event.postback) {
-        	let text = event.postback
-        	sendTextMessage(sender, "Postback received: " + text)
+        	let choice = event.postback.payload
+        	console.log(choice)
+        	sendTextMessage(sender, 'You choose ' + choice)
       	} else if (_.has(event.message, 'attachments') && event.message.attachments[0].type === 'location') {
-			let attachments = event.message.attachments[0];
-			let coordinates = attachments.payload.coordinates;
-			userResponse(sender, coordinates);
-			updateState(sender, 'time')
-			sendTextMessage(sender, "When do you want to go ?");
-			sendTextMessage(sender, "Respond choices : now / at HH:MM");
+			let attachments = event.message.attachments[0]
+			let coordinates = attachments.payload.coordinates
+			userResponse(sender, coordinates)
+			
+			getClosestCity(coordinates.lat, coordinates.long)
+				.then(body => sendTextMessage(sender, 'You are located in '+ body.name))
+				.catch(onError(sender))
+
+			sendTextMessage(sender, 'When do you want to go ?')
+			sendTextMessage(sender, 'Respond choices : now / at HH:MM')
 		}
 	}) 
 	res.sendStatus(200)
