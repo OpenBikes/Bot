@@ -3,8 +3,14 @@ export default {
 	OK: 200,
 	port: process.env.PORT || 3000,
 
-	accessToken: process.env.FB_ACCESS_TOKEN,
-	verifyToken: process.env.FB_VERIFY_TOKEN,
+	fb: {
+		accessToken: process.env.FB_ACCESS_TOKEN,
+		verifyToken: process.env.FB_VERIFY_TOKEN,
+	},
+
+	googlemaps : {
+		accessToken: process.env.GOOGLE_MAP_DIRECTIONS_API_KEY,
+	},
 
 	broker: {
 		host: process.env.__BROKER_HOST || 'redis',

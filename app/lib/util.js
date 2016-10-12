@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import config from '../config'
 import logger from './logger'
 
@@ -12,7 +10,3 @@ export function msgErrorHandler(err, res, body) {
 	} 
 }
 
-// Check if a date is valid
-export function isValidDate(dateString) {
-	return moment(dateString, config.dateFormat).isValid()
-}

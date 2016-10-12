@@ -3,7 +3,9 @@ import logger from './logger'
 import { redisConn } from './broker'
 import { userResponse, sendTextMessage, sendMakeChoiceMessage } from './messenger'
 import { updateState, getState } from './state'
-import { getClosestCity } from './obapi'
+import { getClosestCity, getFilteredStations } from './obapi'
+import { requestDirectionsAPI } from './ggmaps'
+import chrono from 'chrono-node'
 import _ from 'lodash'
 
 const log = logger('obot.middleware')
@@ -16,7 +18,7 @@ export function getPing(req, res) {
 }
 
 export function verifyCredentials(req, res) {
-	if (req.query['hub.verify_token'] === config.verifyToken) {
+	if (req.query['hub.verify_token'] === config.fb.verifyToken) {
 		res.send(req.query['hub.challenge'])
 	}
 	res.send('Error, wrong validation token')
@@ -40,8 +42,29 @@ export function handleMsgEvents(req, res) {
 				.then(updateState(sender))
 				.then(x => console.log({ state: x }, 'update state'))
 				.catch(onError(sender))
-			
-			sendMakeChoiceMessage(sender, text)
+
+			if (text === 'choice') {
+				sendMakeChoiceMessage(sender, text)
+			}
+
+			if (text === 'date') {
+				sendTextMessage(sender, 'When do you want to go ?\nRespond choices : now / at HH:MM')
+				let date = chrono.parseDate('I want to go now') 
+				sendTextMessage(sender, date)
+			}
+
+			if (text === 'location') {
+				requestDirectionsAPI('place du capitole, toulouse', 'place du busca, toulouse')
+					.then(body => console.log({ body }))
+					.then(body => sendTextMessage(sender, body.status))
+					.catch(onError(sender))
+			}
+
+			if (text === 'station') {
+				getFilteredStations('toulouse', 3, 43.6046520, 1.44420901, 'bikes', 'walking', 1)
+					.then(body => console.log({ body }))
+					.catch(onError(sender))
+			}
 
 			// console.log(state)
 			// if (state === 'welcome') {
@@ -62,8 +85,6 @@ export function handleMsgEvents(req, res) {
 				.then(body => sendTextMessage(sender, 'You are located in '+ body.name))
 				.catch(onError(sender))
 
-			sendTextMessage(sender, 'When do you want to go ?')
-			sendTextMessage(sender, 'Respond choices : now / at HH:MM')
 		}
 	}) 
 	res.sendStatus(200)

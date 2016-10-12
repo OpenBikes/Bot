@@ -10,7 +10,7 @@ export function requestFbMessenger(sender, messageData) {
 	return {
 		url: 'https://graph.facebook.com/v2.6/me/messages',
 		qs: {
-			access_token: config.accessToken
+			access_token: config.fb.accessToken
 		},
 		method: 'POST',
 		json: {
@@ -71,10 +71,6 @@ export function sendMakeChoiceMessage(sender) {
 						type: "postback",
 						title: "Drop a bike off",
 						payload: "dropbike",
-					}, {
-						type: "postback",
-						title: "Make a trip",
-						payload: "fulltrip",
 					}],
 				}]
 			}
