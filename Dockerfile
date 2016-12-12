@@ -1,9 +1,12 @@
-# Dockerfile to build obnode container
+FROM ubuntu:16.04
+MAINTAINER Team Seeding
 
-FROM node:4.2.1
-MAINTAINER Axel Bellec
+# Supervisor installation
+RUN apt-get update && apt-get install -y openssh-server apache2 supervisor
+RUN apt-get -y install python-pip && apt-get -y install git
 
-ENV NODE_ENV development
+# Python requirements
+COPY setup/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
-# default port defined in ./app/config/index.js
-EXPOSE 3000
+CMD ["bash"]

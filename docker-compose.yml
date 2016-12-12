@@ -21,4 +21,4 @@ services:
       - 3000:3000
     links:
       - redis
-    command: node
+    command: python
