@@ -13,12 +13,13 @@ services:
     tty: true
     env_file: .env
     environment:
-      - '__BROKER_HOST=redis'
+      - '__BROKER_HOST__=redis'
+      - '__BROKER_PORT__=6379'
     working_dir: /app
     volumes:
       - .:/app
     ports:
-      - 3000:3000
+      - 5000:5000
     links:
       - redis
     command: python

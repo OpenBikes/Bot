@@ -1,12 +1,16 @@
-FROM ubuntu:16.04
-MAINTAINER Team Seeding
+############################################################
+# Dockerfile 
+############################################################
 
-# Supervisor installation
-RUN apt-get update && apt-get install -y openssh-server apache2 supervisor
-RUN apt-get -y install python-pip && apt-get -y install git
+FROM python:3.5
 
-# Python requirements
+MAINTAINER Axel Bellec
+
+# Get the pip packages and clean up
 COPY setup/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install requests
+RUN pip install -r /tmp/requirements.txt && rm -rf /root/.cache/pip/*
 
-CMD ["bash"]
+COPY . /obot
+
+CMD ["python", "obot/main.py"]
