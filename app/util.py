@@ -7,8 +7,7 @@ from app import config
 def update_broker_record(broker, recipient_id, key, value):
     user_data = pickle.loads(broker.get(recipient_id))
     user_data[key] = value
-    broker.set(recipient_id, pickle.dumps(user_data))
-    # broker.expire(sender_id, config.EXPIRATION_TIME)
+    broker.setex(recipient_id, pickle.dumps(user_data), config.EXPIRATION_TIME)
     print(user_data)
 
 

@@ -13,9 +13,10 @@ import uuid
 from app import app
 from app import ai
 from app.bot import Bot
-from app import util
 from app import config
-
+from app import logging
+from app import util
+from app import NAMESPACE
 
 FB_VERIFY_TOKEN = config.FB_VERIFY_TOKEN
 
@@ -26,6 +27,8 @@ broker = redis.Redis(
 
 bot = Bot(config.FB_ACCESS_TOKEN)
 
+log = logging.tracer(NAMESPACE)
+
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -33,9 +36,10 @@ def verify():
     # the 'hub.challenge' value it receives in the query arguments
     if request.args.get('hub.mode') == 'subscribe' and request.args.get('hub.challenge'):
         if not request.args.get('hub.verify_token') == FB_VERIFY_TOKEN:
+            log.error('verification token mismatch')
             return 'Verification token mismatch', 403
         return request.args['hub.challenge'], 200
-
+    log.info('valid authentification')
     return 'Valid authentification', 200
 
 
@@ -44,8 +48,7 @@ def webhook():
 
     # Processing incoming messaging events
     data = request.get_json()
-    print(data)  # you may not want to log every incoming message in
-    # production, but it's good for testing
+    log.info('incoming messaging events', data=data)
 
     if data['object'] == 'page':
 
@@ -55,6 +58,7 @@ def webhook():
                 if messaging_event.get('message'):
                     # The facebook ID of the person sending you the message
                     sender_id = messaging_event['sender']['id']
+                    log.info('sender id', sender_id=sender_id)
 
                     # Is user already known ?
                     if not broker.get(sender_id):
@@ -99,15 +103,15 @@ def webhook():
                         )
 
                     if bot.has_quick_reply(messaging_event):
-                        qr_payload = bot.get_quick_reply(messaging_event)
-                        if qr_payload['payload'] == 'now':
+                        quick_reply_text = bot.get_quick_reply(messaging_event)
+                        if quick_reply_text == 'Maintenant':
                             moment = dt.datetime.now() + dt.timedelta(minutes=5)
                             util.update_broker_record(broker, sender_id, 'date', moment)
-                        elif qr_payload['payload'] == '15_minutes':
+                        elif quick_reply_text == 'Dans 15 min.':
                             moment = dt.datetime.now() + dt.timedelta(minutes=15)
                             util.update_broker_record(broker, sender_id, 'date', moment)
                         else:
-                            action = qr_payload['payload']
+                            action = quick_reply_text
                             util.update_broker_record(broker, sender_id, 'kind', action)
 
                     # Someone sent us a message
@@ -140,6 +144,7 @@ def webhook():
                     if broker.get(sender_id):
 
                         user_data = pickle.loads(broker.get(sender_id))
+                        print(user_data)
 
                         if not user_data['kind']:
                             bot.send_kind_msg(sender_id)

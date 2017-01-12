@@ -7,7 +7,7 @@ SECRET_KEY = 'd0a3bc38-be11-11e6-a98e-ac293aa0f972'
 DEBUG = True
 
 # Broker settings
-EXPIRATION_TIME = 60 * 5
+EXPIRATION_TIME = 2 * 60
 REDIS_HOST = os.environ.get('__BROKER_HOST__', 'localhost')
 REDIS_PORT = os.environ.get('__BROKER_PORT__', '6379')
 

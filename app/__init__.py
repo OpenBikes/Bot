@@ -1,6 +1,8 @@
 from flask import Flask, url_for
 
-app = Flask(__name__)
+NAMESPACE = 'obot'
+
+app = Flask(NAMESPACE)
 
 # Setup the application
 app.config.from_object('app.config')

@@ -169,4 +169,4 @@ class Bot():
             return False
 
     def get_quick_reply(self, messaging_event):
-        return messaging_event['message']['quick_reply']
+        return messaging_event['message']['text']
