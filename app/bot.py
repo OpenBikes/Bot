@@ -71,14 +71,14 @@ class Bot():
 
         self.post_payload(data)
 
-    def send_location_msg(self, recipient_id):
+    def send_location_msg(self, recipient_id, msg):
 
         data = json.dumps({
             'recipient': {
                 'id': recipient_id
             },
             'message': {
-                'text': 'Veuillez partager votre localisation :',
+                'text': msg,
                 'quick_replies': [
                     {
                         'content_type': 'location',
@@ -89,14 +89,14 @@ class Bot():
 
         self.post_payload(data)
 
-    def send_kind_msg(self, recipient_id):
+    def send_kind_msg(self, recipient_id, msg):
 
         data = json.dumps({
             'recipient': {
                 'id': recipient_id
             },
             'message': {
-                'text': 'Que voulez-vous faire ?',
+                'text': msg,
                 'quick_replies': [
                     {
                         'content_type': 'text',
@@ -114,14 +114,14 @@ class Bot():
 
         self.post_payload(data)
 
-    def send_moment_msg(self, recipient_id):
+    def send_moment_msg(self, recipient_id, msg):
 
         data = json.dumps({
             'recipient': {
                 'id': recipient_id
             },
             'message': {
-                'text': 'Dans combien de temps voulez vous partir ?',
+                'text': msg,
                 'quick_replies': [
                     {
                         'content_type': 'text',

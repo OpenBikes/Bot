@@ -17,6 +17,7 @@ from app import config
 from app import logging
 from app import util
 from app import NAMESPACE
+from app import conversation as conv
 
 FB_VERIFY_TOKEN = config.FB_VERIFY_TOKEN
 
@@ -68,7 +69,8 @@ def webhook():
                             sender_id,
                             pickle.dumps(
                                 dict(city_slug=None, city_name=None,
-                                     kind=None, date=None, location=None)
+                                     kind=None, date=None, location=None,
+                                     predict=None, conversation_done=None)
                             )
                         )
                     else:
@@ -79,7 +81,7 @@ def webhook():
                         coordinates = bot.get_location_payload(messaging_event)
                         closest_city = obpy.get_closest_city(
                             coordinates['lat'], coordinates['long']).json()
-                        bot.send_fb_msg(sender_id, 'Vous êtes à {} 🏢'.format(closest_city['name']))
+                        bot.send_fb_msg(sender_id, 'Vous êtes à {} 😇'.format(closest_city['name']))
 
                         util.update_broker_record(
                             broker,
@@ -122,7 +124,7 @@ def webhook():
                         # The message's text
                         message_text = messaging_event['message'].get('text')
 
-                        if message_text == 'reset':
+                        if message_text.lower() == 'reset':
                             broker.delete(sender_id)
 
                         else:
@@ -131,7 +133,9 @@ def webhook():
                                 print("Je crains ne pas avoir compris ce que vous vouliez dire.")
                             elif ai_response['result'].get('parameters', {}).get('welcome'):
                                 fullname = bot.get_user_fullname(sender_id)
-                                bot.send_fb_msg(sender_id, 'Hey ! Salut {} :)'.format(fullname['first_name']))
+
+                                welcome_sentence = conv.welcome_sentence(fullname['first_name'])
+                                bot.send_fb_msg(sender_id, welcome_sentence)
                             else:
                                 bot_response = ai_response['result']['fulfillment']['speech']
 
@@ -147,14 +151,17 @@ def webhook():
                         print(user_data)
 
                         if not user_data['kind']:
-                            bot.send_kind_msg(sender_id)
+                            bot.send_kind_msg(sender_id, msg=conv.select_action_sentence())
                         elif not user_data['city_slug'] or not user_data['location']:
-                            bot.send_location_msg(sender_id)
+
+                            bot.send_location_msg(sender_id, msg=conv.share_location_sentence())
                         elif not user_data['date']:
-                            bot.send_moment_msg(sender_id)
-                        elif not util.dict_has_none_values(user_data):
+                            bot.send_moment_msg(sender_id, msg=conv.ask_when_sentence())
+                        elif not user_data['predict']:
                             bot.send_fb_msg(
-                                sender_id, "J'ai tout ce qu'il me faut, je vais trouver la station la plus proche...")
+                                sender_id,
+                                "J'ai tout ce qu'il me faut, je vais trouver les stations les plus proches..."
+                            )
 
                             stations = obpy.get_filtered_stations(
                                 limit=3,
@@ -183,9 +190,17 @@ def webhook():
                                 url = util.generate_maps_link(user_data['location']['lat'], user_data['location'][
                                     'long'], station['latitude'], station['longitude'])
 
+                                haversine_dist = util.haversine(
+                                    user_data['location']['lat'],
+                                    user_data['location']['long'],
+                                    station['latitude'],
+                                    station['longitude']
+                                )
+                                distance = util.format_haversine_dist(haversine_dist)
+
                                 station_cards.append({
                                     'title': station['name'],
-                                    'subtitle': '{city} - Prédiction :{pred}'.format(city=user_data['city_name'], pred=pred),
+                                    'subtitle': '[{distance}] - Prédiction : {pred}'.format(distance=distance, pred=pred),
                                     'image_url': util.generate_map_url(lat=station['latitude'], lon=station['longitude']),
                                     'buttons': [{
                                         'type': 'web_url',
@@ -196,7 +211,26 @@ def webhook():
 
                             bot.send_card_msg(sender_id, station_cards)
 
-                # Delivery confirmation
+                            util.update_broker_record(
+                                broker,
+                                sender_id,
+                                'predict',
+                                True
+                            )
+
+                        elif not util.dict_has_none_values(user_data):
+                            bot.send_fb_msg(
+                                sender_id,
+                                'Bonne route ;)'
+                            )
+                            util.update_broker_record(
+                                broker,
+                                sender_id,
+                                'conversation_done',
+                                True
+                            )
+
+                            # Delivery confirmation
                 if messaging_event.get('delivery'):
                     pass
 

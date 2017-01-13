@@ -1,3 +1,4 @@
+import math
 import pickle
 
 from motionless import DecoratedMap, LatLonMarker
@@ -31,3 +32,19 @@ def dict_has_none_values(d):
         if value is None:
             return True
     return False
+
+
+def _toRad(x):
+    return x * math.pi / 180
+
+
+def haversine(lon1, lat1, lon2, lat2):
+    dlat = _toRad(lat2 - lat1)
+    dlon = _toRad(lon2 - lon1)
+    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(_toRad(lat1)) * \
+        math.cos(_toRad(lat2)) * math.sin(dlon / 2) * math.sin(dlon / 2)
+    return 12742 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def format_haversine_dist(dist):
+    return '{}m'.format(round(dist * 1000)) if dist < 1 else '{}km'.format(round(dist, 1))
