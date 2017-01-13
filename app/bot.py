@@ -158,6 +158,13 @@ class Bot():
         except:
             return False
 
+    def has_sticker_payload(self, messaging_event):
+        try:
+            _ = messaging_event['message']['attachments'][0]['payload']['sticker_id']
+            return True
+        except:
+            return False
+
     def get_location_payload(self, messaging_event):
         return messaging_event['message']['attachments'][0]['payload']['coordinates']
 

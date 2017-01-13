@@ -124,9 +124,10 @@ def webhook():
                         # The message's text
                         message_text = messaging_event['message'].get('text')
 
-                        if message_text.lower() == 'reset':
+                        if bot.has_sticker_payload(messaging_event):
+                            log.info('user sent a sticker')
+                        elif message_text.lower() == 'reset':
                             broker.delete(sender_id)
-
                         else:
                             ai_response = ai.get_ai_response(sender_id, message_text)
                             if ai_response['status']['code'] != 200:
@@ -218,16 +219,17 @@ def webhook():
                                 True
                             )
 
-                        elif not util.dict_has_none_values(user_data):
-                            bot.send_fb_msg(
-                                sender_id,
-                                'Bonne route ;)'
-                            )
                             util.update_broker_record(
                                 broker,
                                 sender_id,
                                 'conversation_done',
                                 True
+                            )
+
+                        elif not util.dict_has_none_values(user_data):
+                            bot.send_fb_msg(
+                                sender_id,
+                                'Bonne route ;)'
                             )
 
                             # Delivery confirmation
