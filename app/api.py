@@ -31,6 +31,11 @@ bot = Bot(config.FB_ACCESS_TOKEN)
 log = logging.tracer(NAMESPACE)
 
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({'ping': 'pong'}), 200
+
+
 @app.route('/', methods=['GET'])
 def verify():
     # When the endpoint is registered as a webhook, it must echo back
