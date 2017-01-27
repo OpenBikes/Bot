@@ -223,13 +223,20 @@ def webhook():
                                 broker,
                                 sender_id,
                                 'conversation_done',
-                                True
+                                False
                             )
 
-                        elif not util.dict_has_none_values(user_data):
+                        elif not util.dict_has_none_values(user_data) and not user_data['conversation_done']:
                             bot.send_fb_msg(
                                 sender_id,
                                 'Bonne route ;)'
+                            )
+
+                            util.update_broker_record(
+                                broker,
+                                sender_id,
+                                'conversation_done',
+                                True
                             )
 
                             # Delivery confirmation
