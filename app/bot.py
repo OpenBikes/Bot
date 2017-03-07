@@ -130,8 +130,13 @@ class Bot():
                     },
                     {
                         'content_type': 'text',
-                        'title': 'Dans 15 min.',
-                        'payload': '15_minutes'
+                        'title': 'Dans 10 min.',
+                        'payload': '10_minutes'
+                    },
+                    {
+                        'content_type': 'text',
+                        'title': 'Dans 30 min.',
+                        'payload': '30_minutes'
                     }
                 ]
             }

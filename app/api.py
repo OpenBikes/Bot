@@ -9,7 +9,6 @@ import obpy
 import redis
 import uuid
 
-
 from app import app
 from app import ai
 from app.bot import Bot
@@ -114,8 +113,11 @@ def webhook():
                         if quick_reply_text == 'Maintenant':
                             moment = dt.datetime.now() + dt.timedelta(minutes=5)
                             util.update_broker_record(broker, sender_id, 'date', moment)
-                        elif quick_reply_text == 'Dans 15 min.':
-                            moment = dt.datetime.now() + dt.timedelta(minutes=15)
+                        elif quick_reply_text == 'Dans 10 min.':
+                            moment = dt.datetime.now() + dt.timedelta(minutes=10)
+                            util.update_broker_record(broker, sender_id, 'date', moment)
+                        elif quick_reply_text == 'Dans 30 min.':
+                            moment = dt.datetime.now() + dt.timedelta(minutes=30)
                             util.update_broker_record(broker, sender_id, 'date', moment)
                         else:
                             action = quick_reply_text
