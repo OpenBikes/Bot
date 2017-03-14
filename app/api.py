@@ -20,10 +20,12 @@ from app import conversation as conv
 
 FB_VERIFY_TOKEN = config.FB_VERIFY_TOKEN
 
-broker = redis.Redis(
-    host=config.REDIS_HOST,
-    port=config.REDIS_PORT
-)
+# broker = redis.Redis(
+#     host=config.REDIS_HOST,
+#     port=config.REDIS_PORT
+# )
+
+broker = redis.from_url(os.environ['REDISCLOUD_URL'])
 
 bot = Bot(config.FB_ACCESS_TOKEN)
 
