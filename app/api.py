@@ -64,9 +64,15 @@ def webhook():
         for entry in data['entry']:
             for messaging_event in entry['messaging']:
 
-                if messaging_event.get('message'):
+                if messaging_event.get('read'):
+                    log.debug('message read', sender_id=sender_id)
+                elif messaging_event.get('delivery'):
+                    log.debug('message delivered', sender_id=sender_id)
+                elif messaging_event.get('message'):
+
                     # The facebook ID of the person sending you the message
                     sender_id = messaging_event['sender']['id']
+
                     log.info('sender id', sender_id=sender_id)
 
                     # Is user already known ?
