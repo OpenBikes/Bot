@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="misc/messenger_code.jpg" alt="obpy_messenger_code" width="20%"/>
+  <img src="misc/obot.png" alt="logo_obot" width="20%"/>
 </div>
 
 # OBot
