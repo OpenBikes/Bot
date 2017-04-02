@@ -3,9 +3,9 @@ import os
 import pickle
 
 from flask import Blueprint, jsonify, request
+from obpy import Obpy
 import apiai
 import datetime as dt
-import obpy
 import redis
 import uuid
 
@@ -30,6 +30,8 @@ broker = redis.from_url(os.environ['REDISCLOUD_URL'])
 bot = Bot(config.FB_ACCESS_TOKEN)
 
 log = logging.tracer(NAMESPACE)
+
+obapi = Obpy(base_url=config.OPENBIKES_API_URL)
 
 
 @app.route('/ping', methods=['GET'])
@@ -85,7 +87,7 @@ def webhook():
                     # Someone sent us his location
                     if bot.has_location_payload(messaging_event):
                         coordinates = bot.get_location_payload(messaging_event)
-                        closest_city = obpy.get_closest_city(
+                        closest_city = obapi.get_closest_city(
                             coordinates['lat'], coordinates['long']).json()
                         bot.send_fb_msg(sender_id, 'Vous êtes à {} 😇'.format(closest_city['name']))
 
@@ -173,7 +175,7 @@ def webhook():
                                 "J'ai tout ce qu'il me faut, je vais trouver les stations les plus proches..."
                             )
 
-                            stations = obpy.get_filtered_stations(
+                            stations = obapi.get_filtered_stations(
                                 limit=3,
                                 desired_quantity=1,
                                 city_slug=user_data['city_slug'],
@@ -188,7 +190,7 @@ def webhook():
 
                             station_cards = []
                             for station in stations.json():
-                                forecast = obpy.get_forecast(
+                                forecast = obapi.get_forecast(
                                     city_slug=user_data['city_slug'],
                                     station_slug=station['slug'],
                                     kind='bikes' if user_data['kind'] == 'prendre' else 'spaces',

@@ -19,3 +19,6 @@ APIAI_CLIENT_ACCESS_TOKEN = os.environ.get('APIAI_CLIENT_ACCESS_TOKEN')
 FB_ACCESS_TOKEN = os.environ.get('FB_ACCESS_TOKEN')
 FB_VERIFY_TOKEN = os.environ.get('FB_VERIFY_TOKEN')
 FB_GRAPH_API_VERSION = 2.6
+
+# OPENBIKES API
+OPENBIKES_API_URL = os.environ.get('OPENBIKES_API_URL') or 'https://api.openbikes.co'
